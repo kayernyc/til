@@ -1,0 +1,24 @@
+name: Build README
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repo
+      uses: actions/checkout@v3
+    - name: Setup Node environment
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm install
+    - name: Test js script
+      env:
+        OCTOKEY: ${{ secrets.OCTOKEY }}
+      run: |
+        node update-readme.js
