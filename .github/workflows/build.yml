@@ -21,4 +21,4 @@ jobs:
       env:
         OCTOKEY: ${{ secrets.OCTOKEY }}
       run: |
-        node update-readme.js
+        node update-db.js
