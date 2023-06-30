@@ -10,7 +10,7 @@ const fetchAllChanges = async () => {
   
   const result =  await octokit.graphql(`
   query { 
-    repository(name: "verb-practice-monorepo", owner: "kayernyc") {
+    repository(name: "verb-practice-monorepo", owner: "til") {
       id
       pushedAt
       pullRequests(first: 5) {
