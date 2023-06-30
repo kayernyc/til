@@ -4,13 +4,13 @@ const { Octokit } = require("@octokit/rest");
 
 const fetchAllChanges = async () => { 
   const octokit = new Octokit({
-    userAgent: 'kayernyc v1.2.3',
+    userAgent: 'kayernyc-til v1.2.3',
     auth: process.env.OCTOKEY
   });
   
   const result =  await octokit.graphql(`
   query { 
-    repository(name: "verb-practice-monorepo", owner: "til") {
+    repository(name: "til", owner: "kayernyc") {
       id
       pushedAt
       pullRequests(first: 5) {
