@@ -19,6 +19,9 @@ jobs:
       run: npm install
     - name: Test js script
       env:
+        DB_COLLECTION_NAME: ${{ secrets.DB_COLLECTION_NAME }}
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_URL: ${{ secrets.DB_URL }}
         OCTOKEY: ${{ secrets.OCTOKEY }}
       run: |
         node update-db.js
