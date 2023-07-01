@@ -2,7 +2,41 @@ require('dotenv').config();
 const MongoClient = require('mongodb').MongoClient;
 
 const { Octokit } = require("@octokit/rest");
+const graphqlQueryString = `
+query { 
+  repository(name: "til", owner: "kayernyc") {
+    id
+    pushedAt
+    pullRequests(first: 5) {
+      edges {
+        node {
+          id
+          files(first: 5) {
+            nodes {
+              path
+            }
+            totalCount
+          }
+          mergedAt
+        }
+      }
+    }
+  }
+}
+`;
+
 const headerRegex = /(?<prefix># )(?<title>[a-zA-z ]+)/;
+
+const createDBCollection = async (database, collectionName) => {
+  try {
+    await database.createCollection(collectionName);
+    db = database.collection(collectionName);
+    const res = await db.createIndex({'mergedAt': 1, 'titleField': 1}, {unique: true, dropDups: true});
+    console.log(`Unique complex key created ${{res}}`);
+  } catch (err) {
+    console.error(`Error thrown in collection creation: ${err}`); 
+  };
+}
 
 const fetchAllChanges = async () => { 
   const octokit = new Octokit({
@@ -10,30 +44,8 @@ const fetchAllChanges = async () => {
     auth: process.env.OCTOKEY
   });
   
-  const result =  await octokit.graphql(`
-  query { 
-    repository(name: "til", owner: "kayernyc") {
-      id
-      pushedAt
-      pullRequests(first: 5) {
-        edges {
-          node {
-            id
-            files(first: 5) {
-              nodes {
-                path
-              }
-              totalCount
-            }
-            mergedAt
-          }
-        }
-      }
-    }
-  }
-  `);
-
   // TODO: add pagination routine if totalCount > 5
+  const result =  await octokit.graphql(graphqlQueryString);
 
   if (result.repository?.pullRequests?.edges) {
     const { edges } = result.repository?.pullRequests;
@@ -47,18 +59,12 @@ const fetchAllChanges = async () => {
     const database = client.db(process.env.DB_NAME);
 
     // check if collection existes
-    const collectionExists = (await database.listCollections().toArray()).some(collectionObj => collectionObj.name === collectionName);
+    const collectionExists = (await database.listCollections()
+      .toArray())
+      .some(collectionObj => collectionObj.name === collectionName);
    
     if (collectionExists === false) {
-      try {
-        await database.createCollection(collectionName);
-        console.log('got here')
-        db = database.collection(collectionName);
-        const res = await db.createIndex({'mergedAt': 1, 'titleField': 1}, {unique: true, dropDups: true});
-        console.log(`Unique complex key created ${{res}}`);
-      } catch (err) {
-        console.error(`Error thrown in collection creation: ${err}`); 
-      };
+      createDBCollection(database, collectionName);
     }
     
     const collection = database.collection(collectionName);
@@ -89,12 +95,12 @@ const fetchAllChanges = async () => {
 
     try {
       const insertManyResults = await collection.insertMany(records)
-      console.log(`${insertManyResults.insertedCount} documents successfully inserted.`);
+      console.log(`${insertManyResults.insertedCount} document${insertManyResults.insertedCount > 1 ? 's': ''} successfully inserted.`);
     } catch (err) {
       if (err instanceof Error) {
         console.error('ERRROR', err.message);
       } else {
-        console.warn(`Unknow error received: ${error}`);
+        console.warn(`Unknow error received: ${err}`);
       }
     } finally {
       await client.close();
