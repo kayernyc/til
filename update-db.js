@@ -94,11 +94,11 @@ const fetchAllChanges = async () => {
     });
 
     try {
-      const insertManyResults = await collection.insertMany(records)
+      const insertManyResults = await collection.insertMany(records, {ordered: false})
       console.log(`${insertManyResults.insertedCount} document${insertManyResults.insertedCount > 1 ? 's': ''} successfully inserted.`);
     } catch (err) {
       if (err instanceof Error) {
-        console.error('ERRROR', err.message);
+        console.error('ERROR', err.message);
       } else {
         console.warn(`Unknow error received: ${err}`);
       }
