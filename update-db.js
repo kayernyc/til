@@ -7,7 +7,7 @@ query {
   repository(name: "til", owner: "kayernyc") {
     id
     pushedAt
-    pullRequests(first: 5) {
+    pullRequests(first: 5, orderBy: {field: CREATED_AT, direction: DESC}) {
       edges {
         node {
           id
