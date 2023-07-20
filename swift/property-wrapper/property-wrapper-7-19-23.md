@@ -28,5 +28,15 @@ struct Lowercased<String> {
 
 }
 
+
+struct AnExample {
+  @Lowercased var "JFK": String
+}
+
 ```
 
+It's a trivial example but there's always better opportunities to hide complexity:
+
+[NSHipster Example](https://nshipster.com/propertywrapper/)
+
+[Swift Lee](https://www.avanderlee.com/swift/property-wrappers/)

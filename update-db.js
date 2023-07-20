@@ -7,7 +7,7 @@ query {
   repository(name: "til", owner: "kayernyc") {
     id
     pushedAt
-    pullRequests(first: 5) {
+    pullRequests(first: 5, orderBy: {field: CREATED_AT, direction: DESC}) {
       edges {
         node {
           id
@@ -46,6 +46,7 @@ const fetchAllChanges = async () => {
   
   // TODO: add pagination routine if totalCount > 5
   const result =  await octokit.graphql(graphqlQueryString);
+
 
   if (result.repository?.pullRequests?.edges) {
     const { edges } = result.repository?.pullRequests;
