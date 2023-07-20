@@ -47,7 +47,6 @@ const fetchAllChanges = async () => {
   // TODO: add pagination routine if totalCount > 5
   const result =  await octokit.graphql(graphqlQueryString);
 
-
   if (result.repository?.pullRequests?.edges) {
     const { edges } = result.repository?.pullRequests;
     const mds = [];
